@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - Dr.Lee's Beauty</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
+
+        * {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        :root {
+            --primary: #8B6F47;
+            --primary-dark: #6B5344;
+            --accent: #D4A574;
+            --light-bg: #F5F1ED;
+            --text-dark: #3E3E3E;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 로그인 폼 -->
+    <div id="loginForm" class="min-h-screen flex items-center justify-center bg-gray-50">
+        <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+            <div>
+                <h2 class="text-center text-2xl font-bold text-gray-900">관리자 로그인</h2>
+            </div>
+            <form id="authForm" class="space-y-6">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">비밀번호</label>
+                    <input type="password" id="password" name="password" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                </div>
+                <button type="submit" class="btn-primary w-full py-2">
+                    로그인
+                </button>
+            </form>
+            <div id="loginError" class="hidden text-red-600 text-sm text-center"></div>
+        </div>
+    </div>
+
+    <!-- 관리자 대시보드 -->
+    <div id="dashboard" class="hidden min-h-screen bg-gray-50">
+        <!-- 헤더 -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <h1 class="text-xl font-bold text-gray-900">Dr.Lee's Beauty - 관리자</h1>
+                    <button id="logoutBtn" class="text-gray-600 hover:text-gray-900">로그아웃</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- 통계 카드 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="text-2xl">📋</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">총 상담 신청</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="totalCount">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="text-2xl">⏳</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">대기 중</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="pendingCount">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="text-2xl">✅</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">완료</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="completedCount">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상담 신청 목록 -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">상담 신청 내역</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">최근 상담 신청 목록입니다.</p>
+                </div>
+
+                <div id="consultationsList" class="divide-y divide-gray-200">
+                    <!-- 상담 신청 항목들이 여기에 동적으로 추가됩니다 -->
+                </div>
+
+                <div id="loading" class="text-center py-8">
+                    <div class="text-gray-500">로딩 중...</div>
+                </div>
+
+                <div id="emptyState" class="hidden text-center py-8">
+                    <div class="text-gray-500">상담 신청 내역이 없습니다.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 상담 상세 모달 -->
+    <div id="consultationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">상담 신청 상세</h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <span class="text-2xl">&times;</span>
+                    </button>
+                </div>
+
+                <div id="consultationDetail" class="space-y-4">
+                    <!-- 상세 정보가 여기에 표시됩니다 -->
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button id="updateStatusBtn" class="btn-primary px-4 py-2">
+                        상태 변경
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://tzzspafhadhvxvlgomaa.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6enNwYWZoYWRodnh2bGdvbWFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0OTE3ODcsImV4cCI6MjA5MjA2Nzc4N30.8juPFPOMBKtKMnUoPpPe4qgvUPbFTgfPskQ_sh8J6J4';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const ADMIN_PASSWORD = 'admin123'; // 실제 운영 시 환경변수로 관리하세요
+        let currentUser = null;
+        let currentConsultation = null;
+
+        // DOM 요소들
+        const loginForm = document.getElementById('loginForm');
+        const dashboard = document.getElementById('dashboard');
+        const authForm = document.getElementById('authForm');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const consultationsList = document.getElementById('consultationsList');
+        const loading = document.getElementById('loading');
+        const emptyState = document.getElementById('emptyState');
+        const consultationModal = document.getElementById('consultationModal');
+        const consultationDetail = document.getElementById('consultationDetail');
+        const closeModal = document.getElementById('closeModal');
+        const updateStatusBtn = document.getElementById('updateStatusBtn');
+
+        // 통계 요소들
+        const totalCount = document.getElementById('totalCount');
+        const pendingCount = document.getElementById('pendingCount');
+        const completedCount = document.getElementById('completedCount');
+
+        // 인증 확인
+        function checkAuth() {
+            const session = localStorage.getItem('admin_session');
+            if (session && session === 'authenticated') {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        }
+
+        // 로그인 폼 표시
+        function showLogin() {
+            loginForm.classList.remove('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        // 대시보드 표시
+        function showDashboard() {
+            loginForm.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            loadConsultations();
+        }
+
+        // 로그인 처리
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('admin_session', 'authenticated');
+                showDashboard();
+            } else {
+                loginError.textContent = '비밀번호가 올바르지 않습니다.';
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // 로그아웃
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('admin_session');
+            showLogin();
+        });
+
+        // 상담 신청 목록 로드
+        async function loadConsultations() {
+            try {
+                loading.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+
+                const { data, error } = await supabase
+                    .from('consultations')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                loading.classList.add('hidden');
+
+                if (!data || data.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                updateStats(data);
+                renderConsultations(data);
+
+            } catch (error) {
+                console.error('Error loading consultations:', error);
+                loading.classList.add('hidden');
+                consultationsList.innerHTML = '<div class="p-4 text-center text-red-600">데이터를 불러오는 중 오류가 발생했습니다.</div>';
+            }
+        }
+
+        // 통계 업데이트
+        function updateStats(consultations) {
+            const total = consultations.length;
+            const pending = consultations.filter(c => c.status !== 'completed').length;
+            const completed = total - pending;
+
+            totalCount.textContent = total;
+            pendingCount.textContent = pending;
+            completedCount.textContent = completed;
+        }
+
+        // 상담 신청 목록 렌더링
+        function renderConsultations(consultations) {
+            consultationsList.innerHTML = '';
+
+            consultations.forEach(consultation => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-4 hover:bg-gray-50 cursor-pointer';
+                item.onclick = () => showConsultationDetail(consultation);
+
+                const statusClass = consultation.status === 'completed' ? 'status-completed' : 'status-pending';
+                const statusText = consultation.status === 'completed' ? '완료' : '대기중';
+
+                item.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">${consultation.name}</p>
+                                <p class="text-sm text-gray-500">${consultation.email}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="${statusClass}">${statusText}</span>
+                            <span class="text-sm text-gray-500">${new Date(consultation.created_at).toLocaleDateString('ko-KR')}</span>
+                        </div>
+                    </div>
+                `;
+
+                consultationsList.appendChild(item);
+            });
+        }
+
+        // 상담 상세 표시
+        function showConsultationDetail(consultation) {
+            currentConsultation = consultation;
+
+            consultationDetail.innerHTML = `
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">이름</label>
+                        <p class="mt-1 text-sm text-gray-900">${consultation.name}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">이메일</label>
+                        <p class="mt-1 text-sm text-gray-900">${consultation.email}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">연락처</label>
+                        <p class="mt-1 text-sm text-gray-900">${consultation.phone || '미입력'}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">피부 상태</label>
+                        <p class="mt-1 text-sm text-gray-900">${consultation.skin_condition || '미입력'}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">관심 사항</label>
+                        <p class="mt-1 text-sm text-gray-900">${consultation.concern || '미입력'}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">추가 문의</label>
+                        <p class="mt-1 text-sm text-gray-900">${consultation.message || '없음'}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">신청 일시</label>
+                        <p class="mt-1 text-sm text-gray-900">${new Date(consultation.created_at).toLocaleString('ko-KR')}</p>
+                    </div>
+                </div>
+            `;
+
+            consultationModal.classList.remove('hidden');
+        }
+
+        // 모달 닫기
+        closeModal.addEventListener('click', function() {
+            consultationModal.classList.add('hidden');
+            currentConsultation = null;
+        });
+
+        // 상태 변경
+        updateStatusBtn.addEventListener('click', async function() {
+            if (!currentConsultation) return;
+
+            const newStatus = currentConsultation.status === 'completed' ? 'pending' : 'completed';
+
+            try {
+                const { error } = await supabase
+                    .from('consultations')
+                    .update({ status: newStatus })
+                    .eq('id', currentConsultation.id);
+
+                if (error) throw error;
+
+                currentConsultation.status = newStatus;
+                consultationModal.classList.add('hidden');
+                loadConsultations(); // 목록 새로고침
+
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('상태 변경 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 모달 외부 클릭 시 닫기
+        consultationModal.addEventListener('click', function(e) {
+            if (e.target === consultationModal) {
+                consultationModal.classList.add('hidden');
+                currentConsultation = null;
+            }
+        });
+
+        // 초기화
+        checkAuth();
+    </script>
+</body>
+</html>

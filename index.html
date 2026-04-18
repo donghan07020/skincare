@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr.Lee's Beauty - 피부 탄력 케어 전문 브랜드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
+        
+        * {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        :root {
+            --primary: #8B6F47;
+            --primary-dark: #6B5344;
+            --accent: #D4A574;
+            --light-bg: #F5F1ED;
+            --text-dark: #3E3E3E;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(196, 30, 58, 0.4);
+        }
+
+        .btn-primary:focus {
+            outline: none;
+            ring: 3px;
+            ring-color: rgba(196, 30, 58, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary);
+            padding: 12px 28px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary:focus {
+            outline: none;
+            ring: 3px;
+            ring-color: rgba(196, 30, 58, 0.5);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+
+        .heading-xl {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .heading-lg {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .heading-md {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .text-accent {
+            color: var(--primary);
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            margin: 60px 0;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(196, 30, 58, 0.1);
+        }
+
+        .price-badge {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .guarantee-box {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+            border-left: 4px solid var(--primary);
+            padding: 24px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            ring: 2px;
+            ring-color: rgba(196, 30, 58, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .heading-xl {
+                font-size: 1.875rem;
+            }
+            .heading-lg {
+                font-size: 1.5rem;
+            }
+            .heading-md {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div id="logo-container" class="h-10">
+                    <!-- 브랜드 로고가 있으면 자동으로 표시됩니다 -->
+                    <h1 class="text-xl font-bold text-accent">Dr.Lee's Beauty</h1>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#benefits" class="text-gray-600 hover:text-accent font-medium">제품소개</a>
+                <a href="#offer" class="text-gray-600 hover:text-accent font-medium">특별 오퍼</a>
+                <a href="#faq" class="text-gray-600 hover:text-accent font-medium">FAQ</a>
+                <a href="#consultation-form" class="text-gray-600 hover:text-accent font-medium">상담</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 히어로 섹션 -->
+    <section class="bg-gradient-to-b from-amber-50 to-white pt-16 pb-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="mb-6 inline-block">
+                <span class="text-sm font-bold text-accent">🌟 50,000+ 만족한 고객</span>
+            </div>
+            
+            <h1 class="heading-xl text-gray-900 mb-6">
+                20년간 잃어버린 <span class="text-accent">피부 탄력</span>,<br>
+                이제 되찾을 수 있습니다
+            </h1>
+            
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                Dr.Lee's Beauty는 피부 탄력 저하로 고민하는 20~30대 여성을 위해<br>
+                특별히 개발된 프리미엄 케어 라인입니다.
+            </p>
+
+            <!-- 주요 통계 -->
+            <div class="grid grid-cols-3 gap-4 mb-12 max-w-2xl mx-auto">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <p class="text-2xl font-bold text-accent">92%</p>
+                    <p class="text-sm text-gray-600">탄력도 개선</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <p class="text-2xl font-bold text-accent">8주</p>
+                    <p class="text-sm text-gray-600">눈에 띄는 변화</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <p class="text-2xl font-bold text-accent">99%</p>
+                    <p class="text-sm text-gray-600">재구매율</p>
+                </div>
+            </div>
+
+            <!-- CTA 버튼 -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+                <button onclick="scrollToForm()" class="btn-primary">
+                    지금 바로 구매하기
+                </button>
+                <button onclick="scrollToForm()" class="btn-secondary">
+                    무료 상담 신청
+                </button>
+            </div>
+
+            <!-- 히어로 이미지 -->
+            <div class="mt-12">
+                <img src="https://placehold.co/600x400/c41e3a/ffffff?text=Dr.Lee's+Beauty+제품" 
+                     alt="Dr.Lee's Beauty 제품" class="w-full max-w-md mx-auto rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- 문제 공감 섹션 -->
+    <section class="bg-white py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="heading-lg text-gray-900 mb-4">
+                    혹시 이런 고민이 있으신가요?
+                </h2>
+                <p class="text-gray-600">대부분의 20~30대 여성이 공감하는 피부 고충들입니다</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="flex space-x-4">
+                    <div class="text-3xl flex-shrink-0">😔</div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-2">지쳐 보이는 피부</h3>
+                        <p class="text-gray-600 text-sm">아무리 자면서도 피곤해 보이고 생기가 없어요</p>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <div class="text-3xl flex-shrink-0">🤨</div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-2">주름과 탄력 저하</h3>
+                        <p class="text-gray-600 text-sm">전보다 주름이 많아졌고 처짐이 느껴져요</p>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <div class="text-3xl flex-shrink-0">💧</div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-2">보습 부족</h3>
+                        <p class="text-gray-600 text-sm">아무리 바르고 마스크팩을 해도 건조해요</p>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <div class="text-3xl flex-shrink-0">😩</div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-2">복잡한 관리</h3>
+                        <p class="text-gray-600 text-sm">너무 많은 제품을 써야 하고 효과가 불명확해요</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- 해결책 섹션 -->
+    <section class="bg-gradient-to-r from-red-50 to-pink-50 py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="heading-lg text-gray-900 mb-4">
+                    이제 <span class="text-accent">피부 탄력</span>을 되찾으세요
+                </h2>
+                <p class="text-gray-600">3가지 핵심 성분이 작용하는 원리</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-lg text-center shadow-md">
+                    <div class="text-4xl mb-3">⚡</div>
+                    <h3 class="font-bold text-gray-900 mb-3">콜라겐 부스팅</h3>
+                    <p class="text-sm text-gray-600">해양 콜라겐이 피부 속 깊은 층까지 침투하여 탄력을 회복시킵니다</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg text-center shadow-md">
+                    <div class="text-4xl mb-3">🌊</div>
+                    <h3 class="font-bold text-gray-900 mb-3">집중 수분공급</h3>
+                    <p class="text-sm text-gray-600">3단계 보습 시스템으로 12시간 이상 수분을 유지합니다</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg text-center shadow-md">
+                    <div class="text-4xl mb-3">✨</div>
+                    <h3 class="font-bold text-gray-900 mb-3">안티에이징</h3>
+                    <p class="text-sm text-gray-600">천연 항산화 성분이 세포 손상을 방지하고 피부를 보호합니다</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 제품 소개 섹션 -->
+    <section id="benefits" class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="heading-lg text-gray-900 mb-4">
+                    Dr.Lee's Beauty 제품 라인
+                </h2>
+                <p class="text-gray-600">피부 타입별로 정확히 설계된 프리미엄 케어 시스템</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="benefit-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-bold text-gray-900">프리미엄 에센스 에센셜</h3>
+                        <span class="price-badge">필수</span>
+                    </div>
+                    <img src="https://placehold.co/300x300/c41e3a/ffffff?text=에센스" 
+                         alt="에센스" class="w-full rounded-lg mb-4">
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start space-x-2">
+                            <span class="text-accent font-bold mt-0.5">✓</span>
+                            <span class="text-sm text-gray-700">하이드로-리프팅 콜라겐 복합체</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-accent font-bold mt-0.5">✓</span>
+                            <span class="text-sm text-gray-700">나이아신아마이드 + 스쿠알란</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-accent font-bold mt-0.5">✓</span>
+                            <span class="text-sm text-gray-700">즉각적인 탄력감 + 12시간 보습</span>
+                        </li>
+                    </ul>
+                    <p class="text-2xl font-bold text-accent mb-4">¥99,000</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-bold text-gray-900">프리미엄 크림 리치</h3>
+                        <span class="price-badge">핵심</span>
+                    </div>
+                    <img src="https://placehold.co/300x300/ffd700/000000?text=크림" 
+                         alt="크림" class="w-full rounded-lg mb-4">
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start space-x-2">
+                            <span class="text-accent font-bold mt-0.5">✓</span>
+                            <span class="text-sm text-gray-700">세라마이드 + 펩타이드 콤플렉스</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-accent font-bold mt-0.5">✓</span>
+                            <span class="text-sm text-gray-700">수면 중 회복 강화 기술</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-accent font-bold mt-0.5">✓</span>
+                            <span class="text-sm text-gray-700">아침에 깨어나면 탱탱한 피부</span>
+                        </li>
+                    </ul>
+                    <p class="text-2xl font-bold text-accent mb-4">¥149,000</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 오퍼 섹션 -->
+    <section id="offer" class="bg-gradient-to-b from-amber-50 to-white py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="heading-lg text-gray-900 mb-4">
+                    특별 한정 오퍼
+                </h2>
+                <p class="text-gray-600 font-semibold">이달 신규 고객을 위한 특별 할인</p>
+            </div>
+
+            <div class="bg-white border-2 border-accent rounded-lg p-8 mb-8">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600 mb-2">1개 구매 시</p>
+                        <p class="text-3xl font-bold text-gray-900">정가</p>
+                        <p class="text-sm text-gray-600 mt-2">가격 변동 없음</p>
+                    </div>
+                    <div class="text-center border-l border-r border-gray-200">
+                        <p class="text-sm text-accent font-bold mb-2">⭐ 가장 인기</p>
+                        <p class="text-3xl font-bold text-accent">2개 시 30% 할인</p>
+                        <p class="text-sm text-gray-600 mt-2">¥348,000 → ¥243,600</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600 mb-2">20만원 이상</p>
+                        <p class="text-3xl font-bold text-accent">10% 할인</p>
+                        <p class="text-sm text-gray-600 mt-2">모든 구매에 적용</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 보너스 -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg mb-8">
+                <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                    <span class="text-2xl mr-3">🎁</span>
+                    지금 구매하시면 받을 수 있는 보너스
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start space-x-3">
+                        <span class="text-accent font-bold">→</span>
+                        <span class="text-gray-700"><strong>피부 진단 가이드</strong> (¥29,000 상당)</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <span class="text-accent font-bold">→</span>
+                        <span class="text-gray-700"><strong>사용법 비디오 튜토리얼</strong> (올바른 사용법 3분 영상)</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <span class="text-accent font-bold">→</span>
+                        <span class="text-gray-700"><strong>1:1 무료 피부 상담</strong> (전문가 상담사와 30분)</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 보장 -->
+            <div class="guarantee-box text-center">
+                <h3 class="font-bold text-gray-900 mb-3 text-lg">✨ 100% 만족 보장</h3>
+                <p class="text-gray-700 font-semibold mb-2">
+                    7일 이내 <span class="text-accent">무조건 환불</span>
+                </p>
+                <p class="text-sm text-gray-600">
+                    제품을 사용해본 후 만족하지 않으시면 이유 없이 전액 환불해드립니다.<br>
+                    고객 만족이 우리의 첫 번째 목표입니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- FAQ 섹션 -->
+    <section id="faq" class="bg-white py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="heading-lg text-gray-900 mb-4">자주 묻는 질문</h2>
+                <p class="text-gray-600">더 알고 싶으신 내용이 있으신가요?</p>
+            </div>
+
+            <div class="space-y-4">
+                <details class="bg-gray-50 rounded-lg p-6 cursor-pointer group">
+                    <summary class="font-bold text-gray-900 flex items-center justify-between">
+                        <span>Dr.Lee's Beauty 제품은 모든 피부 타입에 적합한가요?</span>
+                        <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 text-sm">
+                        네, 모든 피부 타입(건성, 지성, 복합성, 민감성)에 적합하도록 설계되었습니다. 
+                        특히 저자극 포뮬로 민감한 피부도 안심하고 사용할 수 있습니다. 
+                        궁금하신 점은 무료 상담을 통해 피부 타입별 추천을 받으실 수 있습니다.
+                    </p>
+                </details>
+
+                <details class="bg-gray-50 rounded-lg p-6 cursor-pointer group">
+                    <summary class="font-bold text-gray-900 flex items-center justify-between">
+                        <span>제품을 사용하면 언제부터 효과를 볼 수 있나요?</span>
+                        <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 text-sm">
+                        첫 사용 후 즉시 피부 탄력감을 느낄 수 있으며, 
+                        눈에 띄는 변화는 보통 4주 이내에 관찰됩니다. 
+                        8주 후에는 주름 개선과 피부 톤 개선이 확실하게 나타납니다.
+                    </p>
+                </details>
+
+                <details class="bg-gray-50 rounded-lg p-6 cursor-pointer group">
+                    <summary class="font-bold text-gray-900 flex items-center justify-between">
+                        <span>해외 배송도 가능한가요?</span>
+                        <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 text-sm">
+                        현재는 국내 배송만 가능합니다. 해외 주문 관련 문의사항은 
+                        무료 상담 폼을 통해 문의해주시면 최대한 빠르게 답변해드리겠습니다.
+                    </p>
+                </details>
+
+                <details class="bg-gray-50 rounded-lg p-6 cursor-pointer group">
+                    <summary class="font-bold text-gray-900 flex items-center justify-between">
+                        <span>임산부나 수유 중인데 사용 가능한가요?</span>
+                        <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 text-sm">
+                        저자극 포뮬로 일반적으로 안전하지만, 
+                        의료 전문가와 상담 후 사용을 권장합니다. 
+                        무료 상담에서도 전문가 조언을 받으실 수 있습니다.
+                    </p>
+                </details>
+
+                <details class="bg-gray-50 rounded-lg p-6 cursor-pointer group">
+                    <summary class="font-bold text-gray-900 flex items-center justify-between">
+                        <span>구독 서비스나 정기배송이 있나요?</span>
+                        <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 text-sm">
+                        현재는 단건 구매만 가능합니다. 
+                        정기배송 서비스는 높은 수요에 따라 추후 출시 예정입니다. 
+                        무료 상담을 통해 관심사를 남겨주세요.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- 최종 CTA 섹션 -->
+    <section class="bg-gradient-to-r from-red-600 to-pink-600 py-16 px-4 sm:px-6 lg:px-8 text-white">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="heading-lg mb-6">
+                이제 결정할 차례입니다
+            </h2>
+            <p class="text-lg mb-8 opacity-90">
+                50,000명 이상의 여성이 이미 피부 탄력을 되찾았습니다.<br>
+                당신도 8주 안에 변화를 경험할 수 있습니다.
+            </p>
+            <button onclick="scrollToForm()" class="bg-white text-accent font-bold py-4 px-8 rounded-lg text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl">
+                지금 바로 구매하기
+            </button>
+            <p class="text-sm mt-6 opacity-75">
+                7일 무조건 환불 보장 · 전문가 상담 무료 · 안전한 결제
+            </p>
+        </div>
+    </section>
+
+    <!-- 상담 폼 섹션 -->
+    <section id="consultation-form" class="bg-white py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="heading-lg text-gray-900 mb-4">
+                    무료 피부 상담 신청
+                </h2>
+                <p class="text-gray-600">
+                    전문가가 당신의 피부 타입에 맞는 맞춤 제품을 추천해드립니다.
+                </p>
+            </div>
+
+            <form id="consultationFormElement" class="bg-gray-50 p-8 rounded-lg shadow-md">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="form-group">
+                        <label class="form-label">이름 *</label>
+                        <input type="text" name="name" required class="form-input" placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">연락처 *</label>
+                        <input type="tel" name="phone" required class="form-input" placeholder="010-0000-0000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">이메일 *</label>
+                    <input type="email" name="email" required class="form-input" placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">현재 피부 상태를 알려주세요</label>
+                    <textarea name="skin_condition" class="form-textarea" rows="3" 
+                              placeholder="예: 건성, 민감성, 뾰족한 피부, 심한 주름 등"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">가장 큰 피부 고민은 무엇인가요?</label>
+                    <textarea name="concern" class="form-textarea" rows="3" 
+                              placeholder="예: 탄력 저하, 보습 부족, 주름 등"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">추가 문의 사항</label>
+                    <textarea name="message" class="form-textarea" rows="3" 
+                              placeholder="편하게 적어주세요"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary w-full">
+                    무료 상담 신청하기
+                </button>
+
+                <p class="text-center text-xs text-gray-500 mt-4">
+                    * 개인정보는 상담 목적으로만 사용되며, 24시간 이내 전문가가 연락드립니다.
+                </p>
+            </form>
+
+            <!-- 성공 메시지 -->
+            <div id="successMessage" class="hidden bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg mt-6">
+                <h3 class="font-bold text-green-800 mb-2">✓ 상담 신청이 완료되었습니다!</h3>
+                <p class="text-green-700 text-sm">
+                    감사합니다. 전문가가 24시간 이내 연락드리겠습니다.<br>
+                    그 동안 고객 후기를 확인해보세요.
+                </p>
+            </div>
+            <div id="errorMessage" class="hidden bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg mt-6">
+                <h3 class="font-bold text-red-800 mb-2">⚠️ 제출 중 문제가 발생했습니다.</h3>
+                <p id="errorText" class="text-red-700 text-sm"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- P.S. 섹션 -->
+    <section class="bg-yellow-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto border-l-4 border-accent pl-6">
+            <h3 class="font-bold text-gray-900 mb-2 text-lg">P.S.</h3>
+            <p class="text-gray-700">
+                이 특별 오퍼는 이달 말까지만 유효합니다. 
+                하루 100명 한정으로 30% 할인 혜택이 제공되고 있으니, 
+                지금 바로 신청하세요. 
+                <span class="text-accent font-bold">7일 무조건 환불 보장</span>이 있으니 
+                안심하고 시작할 수 있습니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="bg-gray-900 text-gray-400 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto text-center text-sm">
+            <p class="mb-4">
+                © 2024 Dr.Lee's Beauty. All rights reserved.
+            </p>
+            <p>
+                문의: contact@drleesbeauty.com | 고객센터: 1234-5678
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById('consultationFormElement');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        async function submitConsultation(data) {
+            const response = await fetch('/api/consultation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({}));
+                return result.error || '서버 요청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            }
+
+            return null;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            const formData = new FormData(form);
+            const payload = {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                skin_condition: formData.get('skin_condition'),
+                concern: formData.get('concern'),
+                message: formData.get('message'),
+            };
+
+            const error = await submitConsultation(payload);
+            if (error) {
+                errorText.textContent = error;
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            successMessage.classList.remove('hidden');
+            form.reset();
+
+            setTimeout(function() {
+                successMessage.classList.add('hidden');
+            }, 5000);
+        });
+
+        function scrollToForm() {
+            document.getElementById('consultation-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.addEventListener('load', function() {
+            // brand_logo 폴더의 이미지 자동 로드 로직을 여기에 추가할 수 있습니다.
+        });
+    </script>
+</body>
+</html>

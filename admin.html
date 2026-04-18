@@ -6,6 +6,7 @@
     <title>관리자 페이지 - Dr.Lee's Beauty</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
 
@@ -42,104 +43,201 @@
             background-color: var(--primary-dark);
         }
 
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
         .status-pending {
             background-color: #fef3c7;
             color: #92400e;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+        }
+
+        .status-contacted {
+            background-color: #dbeafe;
+            color: #1e40af;
         }
 
         .status-completed {
             background-color: #d1fae5;
             color: #065f46;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
 <body class="min-h-screen">
     <!-- 로그인 폼 -->
-    <div id="loginForm" class="min-h-screen flex items-center justify-center bg-gray-50">
-        <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-            <div>
-                <h2 class="text-center text-2xl font-bold text-gray-900">관리자 로그인</h2>
+    <div id="loginForm" class="min-h-screen flex items-center justify-center modal-backdrop">
+        <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-2xl border">
+            <div class="text-center">
+                <div class="mx-auto h-12 w-12 bg-primary rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-lock text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">관리자 로그인</h2>
+                <p class="mt-2 text-sm text-gray-600">Dr.Lee's Beauty 관리자 페이지</p>
             </div>
             <form id="authForm" class="space-y-6">
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">비밀번호</label>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-key mr-2"></i>비밀번호
+                    </label>
                     <input type="password" id="password" name="password" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                           placeholder="관리자 비밀번호를 입력하세요">
                 </div>
-                <button type="submit" class="btn-primary w-full py-2">
-                    로그인
+                <button type="submit" class="btn-primary w-full py-3 text-lg font-semibold rounded-lg">
+                    <i class="fas fa-sign-in-alt mr-2"></i>로그인
                 </button>
             </form>
-            <div id="loginError" class="hidden text-red-600 text-sm text-center"></div>
+            <div id="loginError" class="hidden text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <span id="errorText"></span>
+            </div>
         </div>
     </div>
 
     <!-- 관리자 대시보드 -->
     <div id="dashboard" class="hidden min-h-screen bg-gray-50">
         <!-- 헤더 -->
-        <header class="bg-white shadow-sm border-b">
+        <header class="bg-white shadow-sm border-b sticky top-0 z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
-                    <h1 class="text-xl font-bold text-gray-900">Dr.Lee's Beauty - 관리자</h1>
-                    <button id="logoutBtn" class="text-gray-600 hover:text-gray-900">로그아웃</button>
+                    <div class="flex items-center space-x-3">
+                        <div class="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-crown text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Dr.Lee's Beauty</h1>
+                            <p class="text-sm text-gray-500">관리자 대시보드</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="refreshBtn" class="text-gray-600 hover:text-primary transition-colors">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button id="logoutBtn" class="text-gray-600 hover:text-red-600 transition-colors">
+                            <i class="fas fa-sign-out-alt mr-1"></i>로그아웃
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- 메인 콘텐츠 -->
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- 검색 및 필터 -->
+            <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
+                <div class="flex flex-col md:flex-row gap-4 items-center">
+                    <div class="flex-1">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            <input type="text" id="searchInput" placeholder="이름 또는 이메일로 검색..."
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="">전체 상태</option>
+                            <option value="pending">대기중</option>
+                            <option value="contacted">연락완료</option>
+                            <option value="completed">완료</option>
+                            <option value="cancelled">취소</option>
+                        </select>
+                        <button id="resetFilters" class="px-4 py-2 text-gray-600 hover:text-primary transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- 통계 카드 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg border hover:shadow-md transition-shadow">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <div class="text-2xl">📋</div>
+                                <div class="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clipboard-list text-blue-600"></i>
+                                </div>
                             </div>
-                            <div class="ml-5 w-0 flex-1">
+                            <div class="ml-4 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">총 상담 신청</dt>
-                                    <dd class="text-lg font-medium text-gray-900" id="totalCount">0</dd>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">총 상담</dt>
+                                    <dd class="text-2xl font-bold text-gray-900" id="totalCount">0</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg border hover:shadow-md transition-shadow">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <div class="text-2xl">⏳</div>
+                                <div class="h-8 w-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-600"></i>
+                                </div>
                             </div>
-                            <div class="ml-5 w-0 flex-1">
+                            <div class="ml-4 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">대기 중</dt>
-                                    <dd class="text-lg font-medium text-gray-900" id="pendingCount">0</dd>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">대기중</dt>
+                                    <dd class="text-2xl font-bold text-gray-900" id="pendingCount">0</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg border hover:shadow-md transition-shadow">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <div class="text-2xl">✅</div>
+                                <div class="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
                             </div>
-                            <div class="ml-5 w-0 flex-1">
+                            <div class="ml-4 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">완료</dt>
-                                    <dd class="text-lg font-medium text-gray-900" id="completedCount">0</dd>
+                                    <dd class="text-2xl font-bold text-gray-900" id="completedCount">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg border hover:shadow-md transition-shadow">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-phone text-purple-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">연락완료</dt>
+                                    <dd class="text-2xl font-bold text-gray-900" id="contactedCount">0</dd>
                                 </dl>
                             </div>
                         </div>
@@ -148,46 +246,87 @@
             </div>
 
             <!-- 상담 신청 목록 -->
-            <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">상담 신청 내역</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">최근 상담 신청 목록입니다.</p>
+            <div class="bg-white shadow-sm rounded-lg border overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">상담 신청 내역</h3>
+                            <p class="text-sm text-gray-500 mt-1">최근 상담 신청 목록입니다</p>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <span id="resultCount">0</span>개의 결과
+                        </div>
+                    </div>
                 </div>
 
                 <div id="consultationsList" class="divide-y divide-gray-200">
                     <!-- 상담 신청 항목들이 여기에 동적으로 추가됩니다 -->
                 </div>
 
-                <div id="loading" class="text-center py-8">
-                    <div class="text-gray-500">로딩 중...</div>
+                <div id="loading" class="text-center py-12">
+                    <div class="inline-flex items-center">
+                        <i class="fas fa-spinner fa-spin text-primary mr-2"></i>
+                        <span class="text-gray-500">로딩 중...</span>
+                    </div>
                 </div>
 
-                <div id="emptyState" class="hidden text-center py-8">
-                    <div class="text-gray-500">상담 신청 내역이 없습니다.</div>
+                <div id="emptyState" class="hidden text-center py-12">
+                    <div class="text-gray-400 mb-4">
+                        <i class="fas fa-inbox text-4xl"></i>
+                    </div>
+                    <div class="text-gray-500 text-lg">상담 신청 내역이 없습니다</div>
+                    <div class="text-gray-400 text-sm mt-2">새로운 상담 신청이 도착하면 여기에 표시됩니다</div>
+                </div>
+
+                <div id="noResults" class="hidden text-center py-12">
+                    <div class="text-gray-400 mb-4">
+                        <i class="fas fa-search text-4xl"></i>
+                    </div>
+                    <div class="text-gray-500 text-lg">검색 결과가 없습니다</div>
+                    <div class="text-gray-400 text-sm mt-2">다른 검색어로 시도해보세요</div>
                 </div>
             </div>
         </main>
     </div>
 
     <!-- 상담 상세 모달 -->
-    <div id="consultationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">상담 신청 상세</h3>
-                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-                        <span class="text-2xl">&times;</span>
+    <div id="consultationModal" class="hidden fixed inset-0 modal-backdrop bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-4 mx-auto p-6 border w-full max-w-2xl shadow-2xl rounded-xl bg-white max-h-[90vh] overflow-y-auto">
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-user-circle text-primary mr-3"></i>
+                        상담 신청 상세
+                    </h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
 
-                <div id="consultationDetail" class="space-y-4">
+                <div id="consultationDetail" class="space-y-6">
                     <!-- 상세 정보가 여기에 표시됩니다 -->
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-6">
-                    <button id="updateStatusBtn" class="btn-primary px-4 py-2">
+                <!-- 상태 변경 섹션 -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-edit text-primary mr-2"></i>
                         상태 변경
-                    </button>
+                    </h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1">
+                            <select id="statusSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="pending">대기중</option>
+                                <option value="contacted">연락완료</option>
+                                <option value="completed">완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+                        <button id="updateStatusBtn" class="btn-primary px-6 py-3 whitespace-nowrap">
+                            <i class="fas fa-save mr-2"></i>
+                            저장
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,6 +336,390 @@
         const SUPABASE_URL = 'https://tzzspafhadhvxvlgomaa.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6enNwYWZoYWRodnh2bGdvbWFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0OTE3ODcsImV4cCI6MjA5MjA2Nzc4N30.8juPFPOMBKtKMnUoPpPe4qgvUPbFTgfPskQ_sh8J6J4';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const ADMIN_PASSWORD = 'admin123';
+        let currentUser = null;
+        let currentConsultation = null;
+        let allConsultations = [];
+
+        // DOM 요소들
+        const loginForm = document.getElementById('loginForm');
+        const dashboard = document.getElementById('dashboard');
+        const authForm = document.getElementById('authForm');
+        const loginError = document.getElementById('loginError');
+        const errorText = document.getElementById('errorText');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const consultationsList = document.getElementById('consultationsList');
+        const loading = document.getElementById('loading');
+        const emptyState = document.getElementById('emptyState');
+        const noResults = document.getElementById('noResults');
+        const consultationModal = document.getElementById('consultationModal');
+        const consultationDetail = document.getElementById('consultationDetail');
+        const closeModal = document.getElementById('closeModal');
+        const updateStatusBtn = document.getElementById('updateStatusBtn');
+        const statusSelect = document.getElementById('statusSelect');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const resetFilters = document.getElementById('resetFilters');
+        const resultCount = document.getElementById('resultCount');
+
+        // 통계 요소들
+        const totalCount = document.getElementById('totalCount');
+        const pendingCount = document.getElementById('pendingCount');
+        const completedCount = document.getElementById('completedCount');
+        const contactedCount = document.getElementById('contactedCount');
+
+        // 상태별 스타일 매핑
+        const statusConfig = {
+            pending: { class: 'status-pending', text: '대기중', icon: 'fas fa-clock' },
+            contacted: { class: 'status-contacted', text: '연락완료', icon: 'fas fa-phone' },
+            completed: { class: 'status-completed', text: '완료', icon: 'fas fa-check-circle' },
+            cancelled: { class: 'status-cancelled', text: '취소', icon: 'fas fa-times-circle' }
+        };
+
+        // 인증 확인
+        function checkAuth() {
+            const session = localStorage.getItem('admin_session');
+            if (session && session === 'authenticated') {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        }
+
+        // 로그인 폼 표시
+        function showLogin() {
+            loginForm.classList.remove('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        // 대시보드 표시
+        function showDashboard() {
+            loginForm.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            loadConsultations();
+        }
+
+        // 로그인 처리
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('admin_session', 'authenticated');
+                showDashboard();
+            } else {
+                errorText.textContent = '비밀번호가 올바르지 않습니다.';
+                loginError.classList.remove('hidden');
+                setTimeout(() => {
+                    loginError.classList.add('hidden');
+                }, 3000);
+            }
+        });
+
+        // 로그아웃
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('admin_session');
+            showLogin();
+        });
+
+        // 새로고침
+        refreshBtn.addEventListener('click', function() {
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            loadConsultations();
+            setTimeout(() => {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+            }, 1000);
+        });
+
+        // 검색 및 필터링
+        searchInput.addEventListener('input', filterConsultations);
+        statusFilter.addEventListener('change', filterConsultations);
+        resetFilters.addEventListener('click', function() {
+            searchInput.value = '';
+            statusFilter.value = '';
+            filterConsultations();
+        });
+
+        // 상담 신청 목록 로드
+        async function loadConsultations() {
+            try {
+                loading.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                noResults.classList.add('hidden');
+
+                const { data, error } = await supabase
+                    .from('consultations')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                loading.classList.add('hidden');
+                allConsultations = data || [];
+
+                if (allConsultations.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                updateStats(allConsultations);
+                filterConsultations();
+
+            } catch (error) {
+                console.error('Error loading consultations:', error);
+                loading.classList.add('hidden');
+                consultationsList.innerHTML = `
+                    <div class="p-8 text-center text-red-600">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-4"></i>
+                        <div class="text-lg font-semibold mb-2">데이터를 불러오는 중 오류가 발생했습니다</div>
+                        <div class="text-sm">잠시 후 다시 시도해주세요</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 통계 업데이트
+        function updateStats(consultations) {
+            const total = consultations.length;
+            const pending = consultations.filter(c => c.status === 'pending').length;
+            const contacted = consultations.filter(c => c.status === 'contacted').length;
+            const completed = consultations.filter(c => c.status === 'completed').length;
+
+            totalCount.textContent = total;
+            pendingCount.textContent = pending;
+            contactedCount.textContent = contacted;
+            completedCount.textContent = completed;
+        }
+
+        // 검색 및 필터링 적용
+        function filterConsultations() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusFilterValue = statusFilter.value;
+
+            let filtered = allConsultations.filter(consultation => {
+                const matchesSearch = !searchTerm ||
+                    consultation.name.toLowerCase().includes(searchTerm) ||
+                    consultation.email.toLowerCase().includes(searchTerm) ||
+                    (consultation.phone && consultation.phone.includes(searchTerm));
+
+                const matchesStatus = !statusFilterValue || consultation.status === statusFilterValue;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            resultCount.textContent = filtered.length;
+            renderConsultations(filtered);
+
+            if (filtered.length === 0 && allConsultations.length > 0) {
+                noResults.classList.remove('hidden');
+                consultationsList.classList.add('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                consultationsList.classList.remove('hidden');
+            }
+        }
+
+        // 상담 신청 목록 렌더링
+        function renderConsultations(consultations) {
+            consultationsList.innerHTML = '';
+
+            consultations.forEach(consultation => {
+                const item = document.createElement('div');
+                item.className = 'px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors fade-in';
+                item.onclick = () => showConsultationDetail(consultation);
+
+                const statusInfo = statusConfig[consultation.status] || statusConfig.pending;
+                const createdDate = new Date(consultation.created_at).toLocaleDateString('ko-KR');
+                const createdTime = new Date(consultation.created_at).toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                item.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="h-10 w-10 bg-primary bg-opacity-10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">${consultation.name}</p>
+                                <p class="text-sm text-gray-500">${consultation.email}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <div class="text-sm text-gray-500">${createdDate}</div>
+                                <div class="text-xs text-gray-400">${createdTime}</div>
+                            </div>
+                            <span class="status-badge ${statusInfo.class}">
+                                <i class="${statusInfo.icon} mr-1"></i>
+                                ${statusInfo.text}
+                            </span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+                    </div>
+                `;
+
+                consultationsList.appendChild(item);
+            });
+        }
+
+        // 상담 상세 표시
+        function showConsultationDetail(consultation) {
+            currentConsultation = consultation;
+
+            const statusInfo = statusConfig[consultation.status] || statusConfig.pending;
+            const createdDateTime = new Date(consultation.created_at).toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            consultationDetail.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-user mr-2 text-primary"></i>이름
+                            </label>
+                            <p class="text-gray-900 font-medium">${consultation.name}</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-envelope mr-2 text-primary"></i>이메일
+                            </label>
+                            <p class="text-gray-900">
+                                <a href="mailto:${consultation.email}" class="hover:text-primary transition-colors">
+                                    ${consultation.email}
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-phone mr-2 text-primary"></i>연락처
+                            </label>
+                            <p class="text-gray-900">${consultation.phone || '미입력'}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-calendar-alt mr-2 text-primary"></i>신청 일시
+                            </label>
+                            <p class="text-gray-900">${createdDateTime}</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-info-circle mr-2 text-primary"></i>현재 상태
+                            </label>
+                            <span class="status-badge ${statusInfo.class}">
+                                <i class="${statusInfo.icon} mr-1"></i>
+                                ${statusInfo.text}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-stethoscope mr-2 text-primary"></i>피부 상태
+                        </label>
+                        <p class="text-gray-900">${consultation.skin_condition || '미입력'}</p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-question-circle mr-2 text-primary"></i>관심 사항
+                        </label>
+                        <p class="text-gray-900">${consultation.concern || '미입력'}</p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-comment mr-2 text-primary"></i>추가 문의
+                        </label>
+                        <p class="text-gray-900 whitespace-pre-wrap">${consultation.message || '없음'}</p>
+                    </div>
+                </div>
+            `;
+
+            // 상태 선택 초기화
+            statusSelect.value = consultation.status;
+            consultationModal.classList.remove('hidden');
+        }
+
+        // 모달 닫기
+        closeModal.addEventListener('click', function() {
+            consultationModal.classList.add('hidden');
+            currentConsultation = null;
+        });
+
+        // 상태 변경
+        updateStatusBtn.addEventListener('click', async function() {
+            if (!currentConsultation) return;
+
+            const newStatus = statusSelect.value;
+
+            try {
+                updateStatusBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>저장 중...';
+                updateStatusBtn.disabled = true;
+
+                const { error } = await supabase
+                    .from('consultations')
+                    .update({
+                        status: newStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentConsultation.id);
+
+                if (error) throw error;
+
+                currentConsultation.status = newStatus;
+                consultationModal.classList.add('hidden');
+                loadConsultations();
+
+                // 성공 메시지 표시 (간단히 alert 대신 콘솔)
+                console.log('상태가 성공적으로 변경되었습니다.');
+
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('상태 변경 중 오류가 발생했습니다.');
+            } finally {
+                updateStatusBtn.innerHTML = '<i class="fas fa-save mr-2"></i>저장';
+                updateStatusBtn.disabled = false;
+            }
+        });
+
+        // 모달 외부 클릭 시 닫기
+        consultationModal.addEventListener('click', function(e) {
+            if (e.target === consultationModal) {
+                consultationModal.classList.add('hidden');
+                currentConsultation = null;
+            }
+        });
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !consultationModal.classList.contains('hidden')) {
+                consultationModal.classList.add('hidden');
+                currentConsultation = null;
+            }
+        });
+
+        // 초기화
+        checkAuth();
+    </script>
+</body>
+</html>
 
         const ADMIN_PASSWORD = 'admin123'; // 실제 운영 시 환경변수로 관리하세요
         let currentUser = null;

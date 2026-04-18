@@ -1,7 +1,26 @@
 -- Supabase SQL for Admin Dashboard
 -- Execute these queries in your Supabase SQL Editor
 
--- 1. Create/Update consultations table with admin fields
+-- 1. First, add status column to existing table if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name = 'consultations' AND column_name = 'status') THEN
+    ALTER TABLE consultations ADD COLUMN status TEXT DEFAULT 'pending'
+      CHECK (status IN ('pending', 'contacted', 'completed', 'cancelled'));
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name = 'consultations' AND column_name = 'updated_at') THEN
+    ALTER TABLE consultations ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+  END IF;
+END $$;
+
+-- 2. Update existing records to have 'pending' status if they are NULL
+UPDATE consultations SET status = 'pending' WHERE status IS NULL;
+
+-- 3. Create/Update consultations table with admin fields (this will work even if table exists)
+-- Note: If table already exists, this will be skipped due to IF NOT EXISTS
 CREATE TABLE IF NOT EXISTS consultations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,

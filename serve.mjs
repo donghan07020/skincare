@@ -3,6 +3,10 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +27,9 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ik
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_QGAMw8i7_92BpD1JqDAJGv6JdZpiDxr4Y';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'donghan07020@gmail.com'; // Resend 테스트 모드에서 사용할 수 있는 계정 이메일
 const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+
+// Supabase 클라이언트 초기화
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function sendResendMail(payload) {
   if (!RESEND_API_KEY) {

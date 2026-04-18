@@ -1,0 +1,17 @@
+{
+  "name": "skincare-landingpage",
+  "version": "1.0.0",
+  "description": "Dr. Lee's Beauty skincare landing page with admin dashboard",
+  "main": "serve.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs",
+    "dev": "node serve.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "keywords": ["skincare", "landingpage", "supabase", "admin"],
+  "author": "donghan07020",
+  "license": "MIT"
+}

@@ -118,6 +118,68 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 관리자 인증 API
+  if (req.url === '/api/admin/login' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
+        if (data.password === ADMIN_PASSWORD) {
+          sendJson(res, 200, { success: true, token: 'admin_session_token' });
+        } else {
+          sendJson(res, 401, { error: '비밀번호가 올바르지 않습니다.' });
+        }
+      } catch (error) {
+        sendJson(res, 500, { error: '로그인 처리 중 오류가 발생했습니다.' });
+      }
+    });
+    return;
+  }
+
+  // 관리자 상담 내역 조회 API
+  if (req.url === '/api/admin/consultations' && req.method === 'GET') {
+    try {
+      const { data, error } = await supabase
+        .from('consultations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      sendJson(res, 200, { success: true, data });
+    } catch (error) {
+      sendJson(res, 500, { error: '상담 내역 조회 중 오류가 발생했습니다.' });
+    }
+    return;
+  }
+
+  // 관리자 상담 상태 변경 API
+  if (req.url.startsWith('/api/admin/consultations/') && req.method === 'PUT') {
+    const id = req.url.split('/').pop();
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+
+        const { error } = await supabase
+          .from('consultations')
+          .update({ status: data.status })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        sendJson(res, 200, { success: true });
+      } catch (error) {
+        sendJson(res, 500, { error: '상태 변경 중 오류가 발생했습니다.' });
+      }
+    });
+    return;
+  }
+
   let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   fs.readFile(filePath, (err, data) => {
     if (err) {
